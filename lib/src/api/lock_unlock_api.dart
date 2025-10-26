@@ -59,7 +59,7 @@ class LockUnlockApi {
     // FormatException when trying to decode an empty string.
     if (response.body.isNotEmpty && response.statusCode != HttpStatus.noContent) {
       return await apiClient.deserializeAsync(await _decodeBodyBytes(response), 'LockunlockSuccess',) as LockunlockSuccess;
-    
+
     }
     return null;
   }
@@ -117,7 +117,6 @@ class LockUnlockApi {
     // FormatException when trying to decode an empty string.
     if (response.body.isNotEmpty && response.statusCode != HttpStatus.noContent) {
       return await apiClient.deserializeAsync(await _decodeBodyBytes(response), 'LockunlockSuccess',) as LockunlockSuccess;
-    
     }
     return null;
   }

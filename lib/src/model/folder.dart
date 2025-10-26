@@ -13,8 +13,11 @@ part of openapi.api;
 class Folder {
   /// Returns a new [Folder] instance.
   Folder({
+    this.id,
     this.name,
   });
+
+  String? id;
 
   ///
   /// Please note: This property should have been non-nullable! Since the specification file
@@ -29,15 +32,16 @@ class Folder {
     other.name == name;
 
   @override
-  int get hashCode =>
-    // ignore: unnecessary_parenthesis
-    (name == null ? 0 : name!.hashCode);
+  int get hashCode => Object.hashAll([id, name]);
 
   @override
-  String toString() => 'Folder[name=$name]';
+  String toString() => 'Folder[id=$id, name=$name]';
 
   Map<String, dynamic> toJson() {
     final json = <String, dynamic>{};
+    if (this.id != null) {
+      json[r'id'] = this.id;
+    }
     if (this.name != null) {
       json[r'name'] = this.name;
     } else {
@@ -65,6 +69,7 @@ class Folder {
       }());
 
       return Folder(
+        id: mapValueOfType<String>(json, r'id'),
         name: mapValueOfType<String>(json, r'name'),
       );
     }
@@ -115,4 +120,3 @@ class Folder {
   static const requiredKeys = <String>{
   };
 }
-

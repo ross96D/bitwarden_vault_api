@@ -144,11 +144,17 @@ class MiscellaneousApi {
   ///
   /// * [bool] includeNumber:
   ///   Include numbers in the **passphrase**.
-  Future<void> generateGet({ int? length, bool? uppercase, bool? lowercase, bool? number, bool? special, bool? passphrase, int? words, String? separator, bool? capitalize, bool? includeNumber, }) async {
+  Future<String?> generateGet({ int? length, bool? uppercase, bool? lowercase, bool? number, bool? special, bool? passphrase, int? words, String? separator, bool? capitalize, bool? includeNumber, }) async {
     final response = await generateGetWithHttpInfo( length: length, uppercase: uppercase, lowercase: lowercase, number: number, special: special, passphrase: passphrase, words: words, separator: separator, capitalize: capitalize, includeNumber: includeNumber, );
     if (response.statusCode >= HttpStatus.badRequest) {
       throw ApiException(response.statusCode, await _decodeBodyBytes(response));
     }
+    if (response.body.isNotEmpty && response.statusCode != HttpStatus.noContent) {
+      final value = json.decode(await _decodeBodyBytes(response));
+      if (value['success'] != true) return null;
+      return value['data']['data'];
+    }
+    return null;
   }
 
   /// Retrieve your fingerprint phrase.
@@ -184,11 +190,17 @@ class MiscellaneousApi {
   /// Retrieve your fingerprint phrase.
   ///
   /// Retrieve your fingerprint phrase.
-  Future<void> objectFingerprintMeGet() async {
+  Future<String?> objectFingerprintMeGet() async {
     final response = await objectFingerprintMeGetWithHttpInfo();
     if (response.statusCode >= HttpStatus.badRequest) {
       throw ApiException(response.statusCode, await _decodeBodyBytes(response));
     }
+    if (response.body.isNotEmpty && response.statusCode != HttpStatus.noContent) {
+      final value = json.decode(await _decodeBodyBytes(response));
+      if (value['success'] != true) return null;
+      return value['data']['data'];
+    }
+    return null;
   }
 
   /// Retrieve a JSON template for any object.
@@ -283,7 +295,6 @@ class MiscellaneousApi {
     // FormatException when trying to decode an empty string.
     if (response.body.isNotEmpty && response.statusCode != HttpStatus.noContent) {
       return await apiClient.deserializeAsync(await _decodeBodyBytes(response), 'Status',) as Status;
-    
     }
     return null;
   }

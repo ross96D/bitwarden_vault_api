@@ -200,8 +200,8 @@ class ApiClient {
           return ItemLogin.fromJson(value);
         case 'ItemSecureNote':
           return ItemSecureNote.fromJson(value);
-        case 'ItemTemplate':
-          return ItemTemplate.fromJson(value);
+        case 'Item':
+          return Item.fromJson(value);
         case 'LockunlockSuccess':
           return LockunlockSuccess.fromJson(value);
         case 'LockunlockSuccessData':
@@ -240,11 +240,11 @@ class ApiClient {
               value.values.map<dynamic>((dynamic v) => fromJson(v, match, growable: growable,)),
             );
           }
+          throw Exception('Could not find a suitable class for deserialization for type $targetType and decoded body type ${value.runtimeType}');
       }
     } on Exception catch (error, trace) {
       throw ApiException.withInner(HttpStatus.internalServerError, 'Exception during deserialization.', error, trace,);
     }
-    throw ApiException(HttpStatus.internalServerError, 'Could not find a suitable class for deserialization',);
   }
 }
 

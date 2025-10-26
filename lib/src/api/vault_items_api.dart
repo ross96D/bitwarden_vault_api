@@ -108,11 +108,24 @@ class VaultItemsApi {
   ///
   /// * [String] search:
   ///   List all items that contain this search term in its name, username, or URI.
-  Future<void> listObjectItemsGet({ String? organizationId, String? collectionId, String? folderid, String? url, bool? trash, String? search, }) async {
+  Future<List<Item>> listObjectItemsGet({ String? organizationId, String? collectionId, String? folderid, String? url, bool? trash, String? search, }) async {
     final response = await listObjectItemsGetWithHttpInfo( organizationId: organizationId, collectionId: collectionId, folderid: folderid, url: url, trash: trash, search: search, );
     if (response.statusCode >= HttpStatus.badRequest) {
       throw ApiException(response.statusCode, await _decodeBodyBytes(response));
     }
+    if (response.body.isNotEmpty && response.statusCode != HttpStatus.noContent) {
+      final responseBody = await _decodeBodyBytes(response);
+      final value = json.decode(responseBody);
+      if (value['success'] != true) return [];
+
+      final result  = <Item>[];
+      for (final itemJson in value["data"]["data"]) {
+        final item = Item.fromJson(itemJson);
+        if (item != null) result.add(item);
+      }
+      return result;
+    }
+    return [];
   }
 
   /// Delete an item from your vault.
@@ -210,11 +223,19 @@ class VaultItemsApi {
   ///
   /// * [String] id (required):
   ///   Unique identifier of the item to retrieve.
-  Future<void> objectItemIdGet(String id,) async {
+  Future<Item?> objectItemIdGet(String id,) async {
     final response = await objectItemIdGetWithHttpInfo(id,);
     if (response.statusCode >= HttpStatus.badRequest) {
       throw ApiException(response.statusCode, await _decodeBodyBytes(response));
     }
+    if (response.body.isNotEmpty && response.statusCode != HttpStatus.noContent) {
+      final value = json.decode((await _decodeBodyBytes(response)));
+
+      if (value['success'] != true) return null;
+
+      return Item.fromJson(value['data']);
+    }
+    return null;
   }
 
   /// Edit an item in your Vault.
@@ -228,15 +249,15 @@ class VaultItemsApi {
   /// * [String] id (required):
   ///   Unique identifier of the item to edit.
   ///
-  /// * [ItemTemplate] itemTemplate (required):
+  /// * [Item] item (required):
   ///   The request body must contain an object representing the edits to make to the item.<br><br>**Include the full object in the request body**, not just the properties to edit, as the new object will replace the pre-existing object.
-  Future<Response> objectItemIdPutWithHttpInfo(String id, ItemTemplate itemTemplate,) async {
+  Future<Response> objectItemIdPutWithHttpInfo(String id, Item item,) async {
     // ignore: prefer_const_declarations
     final path = r'/object/item/{id}'
       .replaceAll('{id}', id);
 
     // ignore: prefer_final_locals
-    Object? postBody = itemTemplate;
+    Object? postBody = item;
 
     final queryParams = <QueryParam>[];
     final headerParams = <String, String>{};
@@ -265,13 +286,22 @@ class VaultItemsApi {
   /// * [String] id (required):
   ///   Unique identifier of the item to edit.
   ///
-  /// * [ItemTemplate] itemTemplate (required):
+  /// * [Item] item (required):
   ///   The request body must contain an object representing the edits to make to the item.<br><br>**Include the full object in the request body**, not just the properties to edit, as the new object will replace the pre-existing object.
-  Future<void> objectItemIdPut(String id, ItemTemplate itemTemplate,) async {
-    final response = await objectItemIdPutWithHttpInfo(id, itemTemplate,);
+  Future<Item?> objectItemIdPut(String id, Item item,) async {
+    final response = await objectItemIdPutWithHttpInfo(id, item,);
     if (response.statusCode >= HttpStatus.badRequest) {
       throw ApiException(response.statusCode, await _decodeBodyBytes(response));
     }
+
+    if (response.body.isNotEmpty && response.statusCode != HttpStatus.noContent) {
+      final value = json.decode((await _decodeBodyBytes(response)));
+
+      if (value['success'] != true) return null;
+
+      return Item.fromJson(value['data']);
+    }
+    return null;
   }
 
   /// Add a new item to your vault.
@@ -282,14 +312,14 @@ class VaultItemsApi {
   ///
   /// Parameters:
   ///
-  /// * [ItemTemplate] itemTemplate (required):
+  /// * [Item] item (required):
   ///   The request body must contain an object representing the item to add to your Vault. Indicate [item type](https://bitwarden.com/help/cli/#item-types) with `\"type\":` and only provide data in the appropriate type's object (e.g. `\"login\":{}` or `\"identity\":{}`). See the **Examples** for help.
-  Future<Response> objectItemPostWithHttpInfo(ItemTemplate itemTemplate,) async {
+  Future<Response> objectItemPostWithHttpInfo(Item item,) async {
     // ignore: prefer_const_declarations
     final path = r'/object/item';
 
     // ignore: prefer_final_locals
-    Object? postBody = itemTemplate;
+    Object? postBody = item;
 
     final queryParams = <QueryParam>[];
     final headerParams = <String, String>{};
@@ -315,13 +345,21 @@ class VaultItemsApi {
   ///
   /// Parameters:
   ///
-  /// * [ItemTemplate] itemTemplate (required):
+  /// * [Item] item (required):
   ///   The request body must contain an object representing the item to add to your Vault. Indicate [item type](https://bitwarden.com/help/cli/#item-types) with `\"type\":` and only provide data in the appropriate type's object (e.g. `\"login\":{}` or `\"identity\":{}`). See the **Examples** for help.
-  Future<void> objectItemPost(ItemTemplate itemTemplate,) async {
-    final response = await objectItemPostWithHttpInfo(itemTemplate,);
+  Future<Item?> objectItemPost(Item item,) async {
+    final response = await objectItemPostWithHttpInfo(item,);
     if (response.statusCode >= HttpStatus.badRequest) {
       throw ApiException(response.statusCode, await _decodeBodyBytes(response));
     }
+    if (response.body.isNotEmpty && response.statusCode != HttpStatus.noContent) {
+      final value = json.decode((await _decodeBodyBytes(response)));
+
+      if (value['success'] != true) return null;
+
+      return Item.fromJson(value['data']);
+    }
+    return null;
   }
 
   /// Restore a deleted item.

@@ -46,7 +46,7 @@ part 'model/item_card.dart';
 part 'model/item_identity.dart';
 part 'model/item_login.dart';
 part 'model/item_secure_note.dart';
-part 'model/item_template.dart';
+part 'model/item.dart';
 part 'model/lockunlock_success.dart';
 part 'model/lockunlock_success_data.dart';
 part 'model/move_itemid_organization_id_post_request.dart';

@@ -122,11 +122,24 @@ class CollectionsOrganizationsApi {
   ///
   /// * [String] search:
   ///   List only Collections that contain this search term.
-  Future<void> listObjectCollectionsGet({ String? search, }) async {
+  Future<List<Collection>> listObjectCollectionsGet({ String? search, }) async {
     final response = await listObjectCollectionsGetWithHttpInfo( search: search, );
     if (response.statusCode >= HttpStatus.badRequest) {
       throw ApiException(response.statusCode, await _decodeBodyBytes(response));
     }
+    if (response.body.isNotEmpty && response.statusCode != HttpStatus.noContent) {
+      final responseBody = await _decodeBodyBytes(response);
+      final value = json.decode(responseBody);
+      if (value['success'] != true) return [];
+
+      final result  = <Collection>[];
+      for (final itemJson in value["data"]["data"]) {
+        final item = Collection.fromJson(itemJson);
+        if (item != null) result.add(item);
+      }
+      return result;
+    }
+    return [];
   }
 
   /// List Collections from a specified Organization.
@@ -183,11 +196,19 @@ class CollectionsOrganizationsApi {
   ///
   /// * [String] search:
   ///   List only Collections that contain this search term.
-  Future<void> listObjectOrgCollectionsGet(String organizationId, { String? search, }) async {
+  Future<Collection?> listObjectOrgCollectionsGet(String organizationId, { String? search, }) async {
     final response = await listObjectOrgCollectionsGetWithHttpInfo(organizationId,  search: search, );
     if (response.statusCode >= HttpStatus.badRequest) {
       throw ApiException(response.statusCode, await _decodeBodyBytes(response));
     }
+    if (response.body.isNotEmpty && response.statusCode != HttpStatus.noContent) {
+      final value = json.decode((await _decodeBodyBytes(response)));
+
+      if (value['success'] != true) return null;
+
+      return Collection.fromJson(value['data']);
+    }
+    return null;
   }
 
   /// List members of a specified Organization.

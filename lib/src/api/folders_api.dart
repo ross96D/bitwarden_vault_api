@@ -63,11 +63,24 @@ class FoldersApi {
   ///
   /// * [String] search:
   ///   List all folders that contain this search term.
-  Future<void> listObjectFoldersGet({ String? search, }) async {
+  Future<List<Folder>> listObjectFoldersGet({ String? search, }) async {
     final response = await listObjectFoldersGetWithHttpInfo( search: search, );
     if (response.statusCode >= HttpStatus.badRequest) {
       throw ApiException(response.statusCode, await _decodeBodyBytes(response));
     }
+    if (response.body.isNotEmpty && response.statusCode != HttpStatus.noContent) {
+      final responseBody = await _decodeBodyBytes(response);
+      final value = json.decode(responseBody);
+      if (value['success'] != true) return [];
+
+      final result  = <Folder>[];
+      for (final itemJson in value["data"]["data"]) {
+        final item = Folder.fromJson(itemJson);
+        if (item != null) result.add(item);
+      }
+      return result;
+    }
+    return [];
   }
 
   /// Delete a folder from your vault.
@@ -165,11 +178,19 @@ class FoldersApi {
   ///
   /// * [String] id (required):
   ///   Unique identifier of the item to retrieve.
-  Future<void> objectFolderIdGet(String id,) async {
+  Future<Folder?> objectFolderIdGet(String id,) async {
     final response = await objectFolderIdGetWithHttpInfo(id,);
     if (response.statusCode >= HttpStatus.badRequest) {
       throw ApiException(response.statusCode, await _decodeBodyBytes(response));
     }
+    if (response.body.isNotEmpty && response.statusCode != HttpStatus.noContent) {
+      final value = json.decode((await _decodeBodyBytes(response)));
+
+      if (value['success'] != true) return null;
+
+      return Folder.fromJson(value['data']);
+    }
+    return null;
   }
 
   /// Edit a folder in your vault.
@@ -220,11 +241,20 @@ class FoldersApi {
   ///   Unique identifier of the item to edit.
   ///
   /// * [Folder] folder (required):
-  Future<void> objectFolderIdPut(String id, Folder folder,) async {
+  Future<Folder?> objectFolderIdPut(String id, Folder folder,) async {
     final response = await objectFolderIdPutWithHttpInfo(id, folder,);
     if (response.statusCode >= HttpStatus.badRequest) {
       throw ApiException(response.statusCode, await _decodeBodyBytes(response));
     }
+
+    if (response.body.isNotEmpty && response.statusCode != HttpStatus.noContent) {
+      final value = json.decode((await _decodeBodyBytes(response)));
+
+      if (value['success'] != true) return null;
+
+      return Folder.fromJson(value['data']);
+    }
+    return null;
   }
 
   /// Add a folder to your vault.
@@ -270,10 +300,20 @@ class FoldersApi {
   ///
   /// * [Folder] folder (required):
   ///   The request body must contain an object representing the name for the folder to add.
-  Future<void> objectFolderPost(Folder folder,) async {
+  Future<Folder?> objectFolderPost(Folder folder,) async {
     final response = await objectFolderPostWithHttpInfo(folder,);
     if (response.statusCode >= HttpStatus.badRequest) {
       throw ApiException(response.statusCode, await _decodeBodyBytes(response));
     }
+
+
+    if (response.body.isNotEmpty && response.statusCode != HttpStatus.noContent) {
+      final value = json.decode((await _decodeBodyBytes(response)));
+
+      if (value['success'] != true) return null;
+
+      return Folder.fromJson(value['data']);
+    }
+    return null;
   }
 }
