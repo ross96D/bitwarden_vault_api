@@ -1,5 +1,5 @@
 name: "bitwarden_vault_api"
-version: "1.0.0"
+version: "0.0.1"
 description: "OpenAPI API client"
 homepage: "homepage"
 environment:
