@@ -21,10 +21,6 @@ void main(List<String> args) async {
   try {
     final responseItems = await VaultItemsApi().listObjectItemsGet();
     print(responseItems);
-    // print(JsonEncoder.withIndent("\t").convert(json.decode(responseItems.body)));
-
-    final item = await VaultItemsApi().objectItemIdGet("08281bc9-0a06-4a8c-bec6-b1780103ec35");
-    print(item);
 
     final status = await MiscellaneousApi().statusGet();
     print("");

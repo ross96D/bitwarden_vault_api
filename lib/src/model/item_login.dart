@@ -25,7 +25,7 @@ class ItemLogin {
   /// source code must fall back to having a nullable type.
   /// Consider adding a "default:" property in the specification file to hide this note.
   ///
-  Uris? uris;
+  List<Uris>? uris;
 
   ///
   /// Please note: This property should have been non-nullable! Since the specification file
@@ -61,7 +61,7 @@ class ItemLogin {
   @override
   int get hashCode =>
     // ignore: unnecessary_parenthesis
-    (uris == null ? 0 : uris!.hashCode) +
+    (uris.hashCode) +
     (username == null ? 0 : username!.hashCode) +
     (password == null ? 0 : password!.hashCode) +
     (totp == null ? 0 : totp!.hashCode);
@@ -113,7 +113,7 @@ class ItemLogin {
       }());
 
       return ItemLogin(
-        uris: Uris.fromJson(json[r'uris']),
+        uris: json[r'uris'] != null ? [ for (final e in json[r'uris']) Uris.fromJson(e)! ] : null,
         username: mapValueOfType<String>(json, r'username'),
         password: mapValueOfType<String>(json, r'password'),
         totp: mapValueOfType<String>(json, r'totp'),
@@ -166,4 +166,3 @@ class ItemLogin {
   static const requiredKeys = <String>{
   };
 }
-
