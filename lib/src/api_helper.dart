@@ -1,14 +1,23 @@
-//
-// AUTO-GENERATED FILE, DO NOT MODIFY!
-//
-// @dart=2.18
-
-// ignore_for_file: unused_element, unused_import
-// ignore_for_file: always_put_required_named_parameters_first
-// ignore_for_file: constant_identifier_names
-// ignore_for_file: lines_longer_than_80_chars
-
 part of openapi.api;
+
+sealed class Result<OK, ERR> {
+  const Result();
+
+  const factory Result.ok(OK ok) = ResultOk;
+  const factory Result.error(ERR ok) = ResultErr;
+}
+
+class ResultOk<OK, ERR> extends Result<OK, ERR> {
+  final OK ok;
+
+  const ResultOk(this.ok);
+}
+
+class ResultErr<OK, ERR> extends Result<OK, ERR> {
+  final ERR error;
+
+  const ResultErr(this.error);
+}
 
 class QueryParam {
   const QueryParam(this.name, this.value);
